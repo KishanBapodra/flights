@@ -70,7 +70,6 @@ const AirportSearch = ({ setAirport }: AirportSearchProps) => {
       setAirport(value);
     }
   };
-
   return (
     <Autocomplete
       sx={{ width: { xs: "100%", lg: 250 } }}

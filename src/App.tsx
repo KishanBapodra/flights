@@ -1,6 +1,6 @@
 import FlightBanner from "./components/flights/FlightBanner";
 import { createTheme, CssBaseline, Stack, ThemeProvider } from "@mui/material";
-import Layout from "./components/Layout";
+import Layout from "./layout/Layout";
 import Sections from "./components/flights/Sections";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";

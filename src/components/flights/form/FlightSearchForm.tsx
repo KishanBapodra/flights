@@ -17,6 +17,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { grey } from "@mui/material/colors";
 import dayjs, { Dayjs } from "dayjs";
 import AirportSearch from "../../ui/AirportSearch";
+import { useNavigate } from "react-router";
 
 interface FlightOptionProps {
   tripType: "RoundTrip" | "OneWay";
@@ -50,6 +51,8 @@ const FlightSearchForm = () => {
     entityId: "",
     skyId: "",
   });
+
+  const navigate = useNavigate();
 
   const handleSwapLocations = () => {
     setOrigin(() => ({
@@ -96,7 +99,8 @@ const FlightSearchForm = () => {
           "x-rapidapi-key": API_KEY,
         },
       });
-      const jsonData = await response.json();
+      const flightsData = await response.json();
+      navigate("/search-results", { state: { flights: flightsData } });
     } catch (error) {
       console.error("Error fetching airports:", error);
     }
