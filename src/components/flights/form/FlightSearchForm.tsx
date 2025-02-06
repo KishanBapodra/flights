@@ -97,14 +97,11 @@ const FlightSearchForm = () => {
         },
       });
       const jsonData = await response.json();
-      console.log({ jsonData });
     } catch (error) {
       console.error("Error fetching airports:", error);
     }
   };
 
-  console.log(flightOptions);
-  console.log(flightOptions.departureDate.format("YYYY-MM-DD"));
   return (
     <Card elevation={6} sx={{ overflow: "visible" }}>
       <Box p={3} pb={6}>

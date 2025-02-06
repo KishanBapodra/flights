@@ -17,7 +17,7 @@ function App() {
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Layout>
-          <Stack>
+          <Stack pb={4}>
             <FlightBanner />
             <Sections />
           </Stack>
