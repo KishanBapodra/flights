@@ -7,7 +7,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <Navbar />
-      <Container maxWidth="xl">{children}</Container>
+      <Container sx={{ paddingX: { xs: 0, md: 4 } }} maxWidth="xl">
+        {children}
+      </Container>
     </>
   );
 };

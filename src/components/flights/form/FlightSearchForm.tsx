@@ -16,6 +16,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { DatePicker } from "@mui/x-date-pickers";
 import { grey } from "@mui/material/colors";
 import dayjs, { Dayjs } from "dayjs";
+import AirportSearch from "../../ui/AirportSearch";
 
 interface FlightOptionProps {
   tripType: "RoundTrip" | "OneWay";
@@ -23,12 +24,14 @@ interface FlightOptionProps {
     adults: number;
     children: number;
   };
-  flightClass: "Economy" | "Business" | "FirstClass";
-  origin: string;
-  destination: string;
+  flightClass: "economy" | "business" | "first";
   departureDate: Dayjs;
   returnDate?: Dayjs | null;
 }
+
+const API_URL = import.meta.env.VITE_API_FLIGHT_URL;
+const API_HOST = import.meta.env.VITE_API_HOST;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 const FlightSearchForm = () => {
   const [flightOptions, setFlightOptions] = useState<FlightOptionProps>({
@@ -37,18 +40,27 @@ const FlightSearchForm = () => {
       adults: 1,
       children: 0,
     },
-    flightClass: "Economy",
-    origin: "",
-    destination: "",
+    flightClass: "economy",
     departureDate: dayjs(),
     returnDate: null,
   });
+  const [origin, setOrigin] = useState({ name: "", entityId: "", skyId: "" });
+  const [destination, setDestination] = useState({
+    name: "",
+    entityId: "",
+    skyId: "",
+  });
 
   const handleSwapLocations = () => {
-    setFlightOptions((prev) => ({
-      ...prev,
-      origin: prev.destination,
-      destination: prev.origin,
+    setOrigin(() => ({
+      entityId: destination.entityId,
+      skyId: destination.skyId,
+      name: destination.name,
+    }));
+    setDestination(() => ({
+      entityId: origin.entityId,
+      skyId: origin.skyId,
+      name: origin.name,
     }));
   };
 
@@ -57,7 +69,39 @@ const FlightSearchForm = () => {
     [flightOptions.passengers]
   );
 
-  const handleSearch = () => {};
+  const handleSearch = async () => {
+    try {
+      const { departureDate, returnDate, flightClass, passengers } =
+        flightOptions;
+
+      const queryParams = new URLSearchParams({
+        originSkyId: origin.skyId,
+        destinationSkyId: destination.skyId,
+        originEntityId: origin.entityId,
+        destinationEntityId: destination.entityId,
+        date: departureDate.format("YYYY-MM-DD"),
+        cabinClass: flightClass,
+        adults: passengers.adults.toString(),
+      });
+
+      if (returnDate) {
+        queryParams.append("returnDate", returnDate.format("YYYY-MM-DD"));
+      }
+
+      const url = `${API_URL}?${queryParams.toString()}`;
+
+      const response = await fetch(url, {
+        headers: {
+          "x-rapidapi-host": API_HOST,
+          "x-rapidapi-key": API_KEY,
+        },
+      });
+      const jsonData = await response.json();
+      console.log({ jsonData });
+    } catch (error) {
+      console.error("Error fetching airports:", error);
+    }
+  };
 
   console.log(flightOptions);
   console.log(flightOptions.departureDate.format("YYYY-MM-DD"));
@@ -130,9 +174,9 @@ const FlightSearchForm = () => {
                 },
               }}
             >
-              <MenuItem value="Economy">Economy</MenuItem>
-              <MenuItem value="Business">Business</MenuItem>
-              <MenuItem value="FirstClass">First Class</MenuItem>
+              <MenuItem value="economy">Economy</MenuItem>
+              <MenuItem value="business">Business</MenuItem>
+              <MenuItem value="first">First Class</MenuItem>
             </Select>
           </Stack>
 
@@ -144,7 +188,8 @@ const FlightSearchForm = () => {
             flexWrap="nowrap"
           >
             <Box alignItems="center" display="flex">
-              <TextField
+              <AirportSearch setAirport={setOrigin} />
+              {/* <TextField
                 label="From"
                 sx={{ width: { xs: "100%", lg: 250 } }}
                 value={flightOptions.origin}
@@ -154,11 +199,12 @@ const FlightSearchForm = () => {
                     origin: e.target.value,
                   }))
                 }
-              />
+              /> */}
               <IconButton onClick={handleSwapLocations}>
                 <SwapHoriz />
               </IconButton>
-              <TextField
+              <AirportSearch setAirport={setDestination} />
+              {/* <TextField
                 label="To"
                 sx={{ width: { xs: "100%", lg: 250 } }}
                 value={flightOptions.destination}
@@ -168,7 +214,7 @@ const FlightSearchForm = () => {
                     destination: e.target.value,
                   }))
                 }
-              />
+              /> */}
             </Box>
             <Box
               sx={{ width: "100%", ml: { xs: 0, xl: 2 } }}
